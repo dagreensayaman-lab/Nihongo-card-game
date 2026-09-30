@@ -1,0 +1,987 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Verbes japonais — cartes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#E8EEF3; --surface:#FFFFFF; --ink:#1D2B53; --muted:#5B6884; --line:#C6D2DF;
+    --ok:#2F6B45; --okbg:#D9EDE0; --again:#8E3358; --againbg:#F3DCE6;
+    --warn:#8A6A1A; --warnbg:#F3E6C2;
+    --track:#D3DDE8; --gold:#A9772E; --goldbg:#F3E6CF;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg:#0F1628; --surface:#19233F; --ink:#EAF0FA; --muted:#9BA9C7; --line:#2B3A5E;
+      --ok:#86C99C; --okbg:#1E3A2B; --again:#E9A0BC; --againbg:#40223A;
+      --warn:#E3C566; --warnbg:#3D3418;
+      --track:#243255; --gold:#E3C07D; --goldbg:#3D3018;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#0F1628; --surface:#19233F; --ink:#EAF0FA; --muted:#9BA9C7; --line:#2B3A5E;
+    --ok:#86C99C; --okbg:#1E3A2B; --again:#E9A0BC; --againbg:#40223A;
+    --warn:#E3C566; --warnbg:#3D3418;
+    --track:#243255; --gold:#E3C07D; --goldbg:#3D3018;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Zen Kaku Gothic New', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', system-ui, sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .app { max-width: 520px; margin: 0 auto; padding: 20px 16px 32px; }
+  h1 { font-size: 20px; font-weight: 700; margin: 0 0 14px; }
+
+  .catbar { display: flex; gap: 8px; overflow-x: auto; margin: 0 0 12px; padding-bottom: 2px; }
+  .catbar button { border: 1px solid var(--line); background: var(--surface); color: var(--muted); font: inherit;
+    font-size: 13px; font-weight: 600; padding: 8px 14px; border-radius: 99px; white-space: nowrap; cursor: pointer; }
+  .catbar button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+  .modes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; padding: 4px;
+    background: var(--track); border-radius: 14px; }
+  .modes button { font-size: 13px; padding: 10px 4px; }
+
+  .stats { display: flex; flex-direction: column; gap: 18px; }
+  .stat-overall { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 18px; }
+  .stat-overall .pct { font-size: 36px; font-weight: 700; }
+  .stat-overall .pct-label { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .segbar { display: flex; height: 12px; border-radius: 99px; overflow: hidden; margin-top: 14px; background: var(--track); }
+  .segbar i { display: block; height: 100%; }
+  .seg-red { background: var(--again); }
+  .seg-yellow { background: var(--warn); }
+  .seg-green { background: var(--ok); }
+  .legend { display: flex; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .legend i { width: 9px; height: 9px; border-radius: 99px; display: inline-block; }
+  .stat-cats { display: flex; flex-direction: column; gap: 12px; }
+  .stat-row { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+  .stat-row .top { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+  .stat-row .top b { font-weight: 600; }
+  .stat-row .top span { color: var(--muted); font-size: 12px; }
+  .stat-row .segbar { margin-top: 0; height: 8px; }
+  .modes button { border: 0; background: transparent; color: var(--muted); font: inherit; font-size: 14px;
+    font-weight: 500; padding: 10px 6px; border-radius: 10px; cursor: pointer; }
+  .modes button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 700; }
+  button:focus-visible, .card:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+
+  .progress { margin: 18px 2px 14px; }
+  .bar { height: 8px; border-radius: 99px; background: var(--track); overflow: hidden; }
+  .bar > i { display: block; height: 100%; width: 0; background: var(--gold); transition: width .3s ease; }
+  .meta { display: flex; justify-content: space-between; font-size: 13px; color: var(--muted); margin-top: 8px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 22px;
+    min-height: min(50vh, 380px); padding: 24px 20px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    cursor: pointer; user-select: none; -webkit-user-select: none; position: relative;
+  }
+  .card.turn { animation: turn .28s ease; }
+  @keyframes turn { from { transform: rotateY(75deg); opacity: .3; } to { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .card.turn { animation: none; } .bar > i { transition: none; } }
+
+  .stagepip { position: absolute; top: 14px; right: 16px; font-size: 12px; font-weight: 700; color: var(--gold);
+    background: var(--goldbg); padding: 4px 10px; border-radius: 99px; }
+
+  .kanji { font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    font-weight: 700; font-size: clamp(56px, 20vw, 96px); line-height: 1.2; }
+  .kanji.sm { font-size: clamp(40px, 13vw, 60px); }
+  .read { font-family: 'Shippori Mincho', 'Hiragino Mincho ProN', 'Yu Mincho', serif;
+    font-size: 24px; color: var(--muted); margin-top: 6px; }
+  .romaji { font-size: 14px; font-style: italic; color: var(--muted); opacity: .75; margin-top: 2px; }
+  .fr { font-size: clamp(30px, 9vw, 44px); font-weight: 700; line-height: 1.2; }
+  .hint { color: var(--muted); font-size: 14px; margin-top: 22px; }
+  .sep { width: 48px; height: 1px; background: var(--line); margin: 18px 0; }
+
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+  .btn { border: 0; font: inherit; font-size: 17px; font-weight: 700; padding: 16px; border-radius: 16px; cursor: pointer; }
+  .btn.again { background: var(--againbg); color: var(--again); }
+  .btn.know { background: var(--okbg); color: var(--ok); }
+  .btn.flip, .btn.next { grid-column: 1 / -1; background: var(--ink); color: var(--bg); }
+
+  .choices { display: grid; gap: 8px; width: 100%; margin-top: 22px; }
+  .choice { border: 1px solid var(--line); background: var(--bg); color: var(--ink); font: inherit; font-size: 17px;
+    font-weight: 500; padding: 14px; border-radius: 14px; cursor: pointer; }
+  .choice.right { background: var(--okbg); border-color: var(--ok); color: var(--ok); font-weight: 700; }
+  .choice.wrong { background: var(--againbg); border-color: var(--again); color: var(--again); }
+  .choice:disabled { cursor: default; }
+
+  .opts { margin-top: 22px; display: flex; flex-wrap: wrap; gap: 14px; justify-content: space-between;
+    font-size: 14px; color: var(--muted); align-items: center; }
+  .opts label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+  .linkbtn { background: none; border: 0; padding: 6px 0; font: inherit; font-size: 14px; color: var(--muted);
+    text-decoration: underline; cursor: pointer; }
+
+  .done { text-align: center; padding: 8px 0; }
+  .done .kanji { font-size: 64px; }
+  .done p { color: var(--muted); margin: 8px 0 0; }
+  .done .actions { margin-top: 22px; }
+</style>
+</head>
+<body>
+<main class="app">
+  <h1>Verbes usuels — japonais</h1>
+  <div class="catbar" id="catbar"></div>
+  <div class="modes" id="modes">
+    <button data-mode="jp2fr" aria-pressed="true">日 → FR</button>
+    <button data-mode="fr2jp" aria-pressed="false">FR → 日</button>
+    <button data-mode="quiz" aria-pressed="false">Quiz</button>
+    <button data-mode="stats" aria-pressed="false">Stats</button>
+  </div>
+
+  <div class="progress">
+    <div class="bar"><i id="fill"></i></div>
+    <div class="meta"><span id="known">0 / 20 maîtrisés</span><span id="left"></span></div>
+  </div>
+
+  <div id="stage"></div>
+
+  <div class="opts" id="opts">
+    <label id="readLabel"><input type="checkbox" id="showRomaji"> Afficher le romaji</label>
+    <button class="linkbtn" id="reset">Tout remettre à zéro</button>
+  </div>
+</main>
+
+<script>
+// Chaque mot: w = écriture, r = lecture (kana), f = traduction française, cat = catégorie (pour classer du futur vocabulaire).
+const V = [
+  {w:'する', r:'', f:'faire', cat:'Verbes'},
+  {w:'しゃべる', r:'', f:'parler ; discuter', cat:'Verbes'},
+  {w:'見る', r:'みる', f:'voir', cat:'Verbes'},
+  {w:'来る', r:'くる', f:'venir', cat:'Verbes'},
+  {w:'行く', r:'いく', f:'aller', cat:'Verbes'},
+  {w:'帰る', r:'かえる', f:'rentrer', cat:'Verbes'},
+  {w:'食べる', r:'たべる', f:'manger', cat:'Verbes'},
+  {w:'飲む', r:'のむ', f:'boire', cat:'Verbes'},
+  {w:'買う', r:'かう', f:'acheter', cat:'Verbes'},
+  {w:'売る', r:'うる', f:'vendre', cat:'Verbes'},
+  {w:'切る', r:'きる', f:'couper', cat:'Verbes'},
+  {w:'入る', r:'はいる', f:'entrer', cat:'Verbes'},
+  {w:'出る', r:'でる', f:'sortir', cat:'Verbes'},
+  {w:'持つ', r:'もつ', f:'tenir', cat:'Verbes'},
+  {w:'待つ', r:'まつ', f:'attendre', cat:'Verbes'},
+  {w:'書く', r:'かく', f:'écrire', cat:'Verbes'},
+  {w:'読む', r:'よむ', f:'lire', cat:'Verbes'},
+  {w:'歩く', r:'あるく', f:'marcher', cat:'Verbes'},
+  {w:'走る', r:'はしる', f:'courir', cat:'Verbes'},
+  {w:'遊ぶ', r:'あそぶ', f:'jouer', cat:'Verbes'},
+  {w:'人', r:'ひと', f:'personne', cat:'Kanji utiles'},
+  {w:'男', r:'おとこ', f:'homme', cat:'Kanji utiles'},
+  {w:'女', r:'おんな', f:'femme', cat:'Kanji utiles'},
+  {w:'月', r:'つき', f:'lune', cat:'Kanji utiles'},
+  {w:'火', r:'ひ', f:'feu', cat:'Kanji utiles'},
+  {w:'水', r:'みず', f:'eau', cat:'Kanji utiles'},
+  {w:'木', r:'き', f:'arbre', cat:'Kanji utiles'},
+  {w:'金', r:'かね', f:'argent, or', cat:'Kanji utiles'},
+  {w:'土', r:'つち', f:'terre', cat:'Kanji utiles'},
+  {w:'日', r:'ひ', f:'jour, soleil', cat:'Kanji utiles'},
+  {w:'山', r:'やま', f:'montagne', cat:'Kanji utiles'},
+  {w:'川', r:'かわ', f:'rivière', cat:'Kanji utiles'},
+  {w:'田', r:'た', f:'champ', cat:'Kanji utiles'},
+  {w:'何', r:'なに', f:'quoi ?', cat:'Kanji utiles'},
+  {w:'子', r:'こ', f:'enfant', cat:'Kanji utiles'},
+  {w:'円', r:'えん', f:'yen', cat:'Kanji utiles'},
+  {w:'右', r:'みぎ', f:'droite', cat:'Kanji utiles'},
+  {w:'左', r:'ひだり', f:'gauche', cat:'Kanji utiles'},
+  {w:'上', r:'うえ', f:'dessus', cat:'Kanji utiles'},
+  {w:'下', r:'した', f:'dessous', cat:'Kanji utiles'},
+  {w:'中', r:'なか', f:'centre', cat:'Kanji utiles'},
+  {w:'目', r:'め', f:'œil', cat:'Kanji utiles'},
+  {w:'口', r:'くち', f:'bouche', cat:'Kanji utiles'},
+  {w:'手', r:'て', f:'main', cat:'Kanji utiles'},
+  {w:'耳', r:'みみ', f:'oreille', cat:'Kanji utiles'},
+  {w:'鼻', r:'はな', f:'nez', cat:'Kanji utiles'},
+  {w:'心', r:'こころ', f:'cœur', cat:'Kanji utiles'},
+  {w:'春', r:'はる', f:'printemps', cat:'Kanji utiles'},
+  {w:'夏', r:'なつ', f:'été', cat:'Kanji utiles'},
+  {w:'秋', r:'あき', f:'automne', cat:'Kanji utiles'},
+  {w:'冬', r:'ふゆ', f:'hiver', cat:'Kanji utiles'},
+  {w:'東', r:'ひがし', f:'est', cat:'Kanji utiles'},
+  {w:'西', r:'にし', f:'ouest', cat:'Kanji utiles'},
+  {w:'南', r:'みなみ', f:'sud', cat:'Kanji utiles'},
+  {w:'北', r:'きた', f:'nord', cat:'Kanji utiles'},
+  {w:'学生', r:'がくせい', f:'étudiant', cat:'Kanji utiles'},
+  {w:'先生', r:'せんせい', f:'professeur', cat:'Kanji utiles'},
+  {w:'学校', r:'がっこう', f:'école', cat:'Kanji utiles'},
+  {w:'大学', r:'だいがく', f:'université', cat:'Kanji utiles'},
+  {w:'零', r:'れい・ゼロ', f:'0', cat:'Nombres'},
+  {w:'一', r:'いち', f:'1', cat:'Nombres'},
+  {w:'二', r:'に', f:'2', cat:'Nombres'},
+  {w:'三', r:'さん', f:'3', cat:'Nombres'},
+  {w:'四', r:'し・よん', f:'4', cat:'Nombres'},
+  {w:'五', r:'ご', f:'5', cat:'Nombres'},
+  {w:'六', r:'ろく', f:'6', cat:'Nombres'},
+  {w:'七', r:'しち・なな', f:'7', cat:'Nombres'},
+  {w:'八', r:'はち', f:'8', cat:'Nombres'},
+  {w:'九', r:'く・きゅう', f:'9', cat:'Nombres'},
+  {w:'十', r:'じゅう', f:'10', cat:'Nombres'},
+  {w:'十一', r:'じゅういち', f:'11', cat:'Nombres'},
+  {w:'十二', r:'じゅうに', f:'12', cat:'Nombres'},
+  {w:'十三', r:'じゅうさん', f:'13', cat:'Nombres'},
+  {w:'十四', r:'じゅうし・じゅうよん', f:'14', cat:'Nombres'},
+  {w:'十五', r:'じゅうご', f:'15', cat:'Nombres'},
+  {w:'十六', r:'じゅうろく', f:'16', cat:'Nombres'},
+  {w:'十七', r:'じゅうしち・じゅうなな', f:'17', cat:'Nombres'},
+  {w:'十八', r:'じゅうはち', f:'18', cat:'Nombres'},
+  {w:'十九', r:'じゅうく・じゅうきゅう', f:'19', cat:'Nombres'},
+  {w:'二十', r:'にじゅう', f:'20', cat:'Nombres'},
+  {w:'三十', r:'さんじゅう', f:'30', cat:'Nombres'},
+  {w:'四十', r:'よんじゅう', f:'40', cat:'Nombres'},
+  {w:'五十', r:'ごじゅう', f:'50', cat:'Nombres'},
+  {w:'六十', r:'ろくじゅう', f:'60', cat:'Nombres'},
+  {w:'七十', r:'しちじゅう・ななじゅう', f:'70', cat:'Nombres'},
+  {w:'八十', r:'はちじゅう', f:'80', cat:'Nombres'},
+  {w:'九十', r:'きゅうじゅう', f:'90', cat:'Nombres'},
+  {w:'百', r:'ひゃく', f:'100', cat:'Nombres'},
+  {w:'二百', r:'にひゃく', f:'200', cat:'Nombres'},
+  {w:'三百', r:'さんびゃく', f:'300', cat:'Nombres'},
+  {w:'四百', r:'よんひゃく', f:'400', cat:'Nombres'},
+  {w:'五百', r:'ごひゃく', f:'500', cat:'Nombres'},
+  {w:'六百', r:'ろっぴゃく', f:'600', cat:'Nombres'},
+  {w:'七百', r:'ななひゃく', f:'700', cat:'Nombres'},
+  {w:'八百', r:'はっぴゃく', f:'800', cat:'Nombres'},
+  {w:'九百', r:'きゅうひゃく', f:'900', cat:'Nombres'},
+  {w:'千', r:'せん', f:'1 000', cat:'Nombres'},
+  {w:'二千', r:'にせん', f:'2 000', cat:'Nombres'},
+  {w:'三千', r:'さんぜん', f:'3 000', cat:'Nombres'},
+  {w:'四千', r:'よんせん', f:'4 000', cat:'Nombres'},
+  {w:'五千', r:'ごせん', f:'5 000', cat:'Nombres'},
+  {w:'六千', r:'ろくせん', f:'6 000', cat:'Nombres'},
+  {w:'七千', r:'ななせん', f:'7 000', cat:'Nombres'},
+  {w:'八千', r:'はっせん', f:'8 000', cat:'Nombres'},
+  {w:'九千', r:'きゅうせん', f:'9 000', cat:'Nombres'},
+  {w:'一万', r:'いちまん', f:'10 000', cat:'Nombres'},
+  {w:'十万', r:'じゅうまん', f:'100 000', cat:'Nombres'},
+  {w:'百万', r:'ひゃくまん', f:'1 000 000', cat:'Nombres'},
+  {w:'千万', r:'せんまん', f:'10 000 000', cat:'Nombres'},
+  {w:'月曜日', r:'げつようび', f:'lundi', cat:'Jours de la semaine'},
+  {w:'火曜日', r:'かようび', f:'mardi', cat:'Jours de la semaine'},
+  {w:'水曜日', r:'すいようび', f:'mercredi', cat:'Jours de la semaine'},
+  {w:'木曜日', r:'もくようび', f:'jeudi', cat:'Jours de la semaine'},
+  {w:'金曜日', r:'きんようび', f:'vendredi', cat:'Jours de la semaine'},
+  {w:'土曜日', r:'どようび', f:'samedi', cat:'Jours de la semaine'},
+  {w:'日曜日', r:'にちようび', f:'dimanche', cat:'Jours de la semaine'},
+  {w:'一月', r:'いちがつ', f:'janvier', cat:'Mois'},
+  {w:'二月', r:'にがつ', f:'février', cat:'Mois'},
+  {w:'三月', r:'さんがつ', f:'mars', cat:'Mois'},
+  {w:'四月', r:'しがつ', f:'avril', cat:'Mois'},
+  {w:'五月', r:'ごがつ', f:'mai', cat:'Mois'},
+  {w:'六月', r:'ろくがつ', f:'juin', cat:'Mois'},
+  {w:'七月', r:'しちがつ', f:'juillet', cat:'Mois'},
+  {w:'八月', r:'はちがつ', f:'août', cat:'Mois'},
+  {w:'九月', r:'くがつ', f:'septembre', cat:'Mois'},
+  {w:'十月', r:'じゅうがつ', f:'octobre', cat:'Mois'},
+  {w:'十一月', r:'じゅういちがつ', f:'novembre', cat:'Mois'},
+  {w:'十二月', r:'じゅうにがつ', f:'décembre', cat:'Mois'},
+  {w:'一日', r:'ついたち', f:'le 1er', cat:'Dates du mois'},
+  {w:'二日', r:'ふつか', f:'le 2', cat:'Dates du mois'},
+  {w:'三日', r:'みっか', f:'le 3', cat:'Dates du mois'},
+  {w:'四日', r:'よっか', f:'le 4', cat:'Dates du mois'},
+  {w:'五日', r:'いつか', f:'le 5', cat:'Dates du mois'},
+  {w:'六日', r:'むいか', f:'le 6', cat:'Dates du mois'},
+  {w:'七日', r:'なのか', f:'le 7', cat:'Dates du mois'},
+  {w:'八日', r:'ようか', f:'le 8', cat:'Dates du mois'},
+  {w:'九日', r:'ここのか', f:'le 9', cat:'Dates du mois'},
+  {w:'十日', r:'とおか', f:'le 10', cat:'Dates du mois'},
+  {w:'十四日', r:'じゅうよっか', f:'le 14', cat:'Dates du mois'},
+  {w:'十七日', r:'じゅうしちにち', f:'le 17', cat:'Dates du mois'},
+  {w:'十九日', r:'じゅうくにち', f:'le 19', cat:'Dates du mois'},
+  {w:'二十日', r:'はつか', f:'le 20', cat:'Dates du mois'},
+  {w:'私', r:'わたし', f:'je (formel)', cat:'Pronoms'},
+  {w:'わたくし', r:'', f:'je (très formel)', cat:'Pronoms'},
+  {w:'僕', r:'ぼく', f:'je (masc., familier)', cat:'Pronoms'},
+  {w:'あたし', r:'', f:'je (fém., familier)', cat:'Pronoms'},
+  {w:'俺', r:'おれ', f:'je (vulgaire, masc.)', cat:'Pronoms'},
+  {w:'われわれ', r:'', f:'nous (formel)', cat:'Pronoms'},
+  {w:'あなた', r:'', f:'tu (formel)', cat:'Pronoms'},
+  {w:'君', r:'きみ', f:'tu (masc., familier)', cat:'Pronoms'},
+  {w:'お前', r:'おまえ', f:'tu (vulgaire, masc.)', cat:'Pronoms'},
+  {w:'あんた', r:'', f:'tu (vulgaire)', cat:'Pronoms'},
+  {w:'です', r:'', rj:'desu', f:'être (présent, formel)', cat:'Grammaire : être'},
+  {w:'でした', r:'', rj:'deshita', f:'était (passé, formel)', cat:'Grammaire : être'},
+  {w:'だ', r:'', rj:'da', f:'être (présent, familier)', cat:'Grammaire : être'},
+  {w:'だった', r:'', rj:'datta', f:'était (passé, familier)', cat:'Grammaire : être'},
+  {w:'ではない', r:'', rj:'dewa nai', f:'n\'est pas (familier)', cat:'Grammaire : être'},
+  {w:'ではありません', r:'', rj:'dewa arimasen', f:'n\'est pas (formel)', cat:'Grammaire : être'},
+  {w:'りんご', r:'', rj:'ringo', f:'pomme', cat:'Vocabulaire divers'},
+  {w:'テーブル', r:'', rj:'teeburu', f:'table', cat:'Vocabulaire divers'},
+  {w:'とり', r:'', rj:'tori', f:'oiseau', cat:'Vocabulaire divers'},
+  {w:'ボールペン', r:'', rj:'bōrupen', f:'stylo', cat:'Vocabulaire divers'},
+  {w:'ばか', r:'', rj:'baka', f:'idiot', cat:'Vocabulaire divers'},
+  {w:'テレビ', r:'', rj:'terebi', f:'télévision', cat:'Vocabulaire divers'},
+  {w:'いす', r:'', rj:'isu', f:'chaise', cat:'Vocabulaire divers'},
+  {w:'ねこ', r:'', rj:'neko', f:'chat', cat:'Vocabulaire divers'},
+  {w:'いぬ', r:'', rj:'inu', f:'chien', cat:'Vocabulaire divers'},
+  {w:'ふで', r:'', rj:'fude', f:'pinceau', cat:'Vocabulaire divers'},
+  {w:'パソコン', r:'', rj:'pasokon', f:'ordinateur', cat:'Vocabulaire divers'},
+  {w:'レモン', r:'', rj:'remon', f:'citron', cat:'Vocabulaire divers'},
+  {w:'本', r:'ほん', f:'livre', cat:'Vocabulaire divers'},
+  {w:'うた', r:'', rj:'uta', f:'chanson', cat:'Vocabulaire divers'},
+  {w:'しゃしん', r:'', rj:'shashin', f:'photo', cat:'Vocabulaire divers'},
+  {w:'アニメ', r:'', rj:'anime', f:'dessin animé', cat:'Vocabulaire divers'},
+  {w:'マンガ', r:'', rj:'manga', f:'BD', cat:'Vocabulaire divers'},
+  {w:'おかね', r:'', rj:'o-kane', f:'argent', cat:'Vocabulaire divers'},
+  {w:'星', r:'ほし', f:'étoile', cat:'Météo'},
+  {w:'雨', r:'あめ', f:'pluie', cat:'Météo'},
+  {w:'雪', r:'ゆき', f:'neige', cat:'Météo'},
+  {w:'風', r:'かぜ', f:'vent', cat:'Météo'},
+  {w:'雲', r:'くも', f:'nuage', cat:'Météo'},
+  {w:'晴れ', r:'はれ', f:'beau temps, dégagé', cat:'Météo'},
+  {w:'曇り', r:'くもり', f:'nuageux', cat:'Météo'},
+  {w:'霧', r:'きり', f:'brouillard', cat:'Météo'},
+  {w:'氷', r:'ひょう', f:'gel', cat:'Météo'},
+  {w:'台風', r:'たいふう', f:'typhon', cat:'Météo'},
+  {w:'紅葉', r:'こうよう', f:'feuilles d\'érable', cat:'Météo'},
+  {w:'桜', r:'さくら', f:'fleur de cerisier', cat:'Météo'},
+  {w:'梅雨', r:'つゆ', f:'saison des pluies', cat:'Météo'},
+  {w:'嵐', r:'あらし', f:'tempête', cat:'Météo'},
+  {w:'寒い', r:'さむい', f:'froid', cat:'Météo'},
+  {w:'涼しい', r:'すずしい', f:'frais', cat:'Météo'},
+  {w:'暖かい', r:'あたたかい', f:'tempéré, doux', cat:'Météo'},
+  {w:'暑い', r:'あつい', f:'chaud', cat:'Météo'},
+  {w:'馬', r:'うま', f:'cheval', cat:'Animaux, fruits & légumes'},
+  {w:'牛', r:'うし', f:'vache, taureau', cat:'Animaux, fruits & légumes'},
+  {w:'さる', r:'', rj:'saru', f:'singe', cat:'Animaux, fruits & légumes'},
+  {w:'うさぎ', r:'', rj:'usagi', f:'lapin', cat:'Animaux, fruits & légumes'},
+  {w:'羊', r:'ひつじ', f:'mouton', cat:'Animaux, fruits & légumes'},
+  {w:'へび', r:'', rj:'hebi', f:'serpent', cat:'Animaux, fruits & légumes'},
+  {w:'ぶた', r:'', rj:'buta', f:'cochon', cat:'Animaux, fruits & légumes'},
+  {w:'魚', r:'さかな', f:'poisson', cat:'Animaux, fruits & légumes'},
+  {w:'くま', r:'', rj:'kuma', f:'ours', cat:'Animaux, fruits & légumes'},
+  {w:'あり', r:'', rj:'ari', f:'fourmi', cat:'Animaux, fruits & légumes'},
+  {w:'ライオン', r:'', rj:'raion', f:'lion', cat:'Animaux, fruits & légumes'},
+  {w:'ぞう', r:'', rj:'zō', f:'éléphant', cat:'Animaux, fruits & légumes'},
+  {w:'しか', r:'', rj:'shika', f:'daim, cerf', cat:'Animaux, fruits & légumes'},
+  {w:'とら', r:'', rj:'tora', f:'tigre', cat:'Animaux, fruits & légumes'},
+  {w:'りゅう', r:'', rj:'ryū', f:'dragon', cat:'Animaux, fruits & légumes'},
+  {w:'バナナ', r:'', rj:'banana', f:'banane', cat:'Animaux, fruits & légumes'},
+  {w:'なし', r:'', rj:'nashi', f:'poire', cat:'Animaux, fruits & légumes'},
+  {w:'すいか', r:'', rj:'suika', f:'pastèque', cat:'Animaux, fruits & légumes'},
+  {w:'オレンジ', r:'', rj:'orenji', f:'orange', cat:'Animaux, fruits & légumes'},
+  {w:'みかん', r:'', rj:'mikan', f:'mandarine', cat:'Animaux, fruits & légumes'},
+  {w:'いちご', r:'', rj:'ichigo', f:'fraise', cat:'Animaux, fruits & légumes'},
+  {w:'もも', r:'', rj:'momo', f:'pêche', cat:'Animaux, fruits & légumes'},
+  {w:'トマト', r:'', rj:'tomato', f:'tomate', cat:'Animaux, fruits & légumes'},
+  {w:'じゃがいも', r:'', rj:'jagaimo', f:'pomme de terre', cat:'Animaux, fruits & légumes'},
+  {w:'たまねぎ', r:'', rj:'tamanegi', f:'oignon', cat:'Animaux, fruits & légumes'},
+  {w:'レタス', r:'', rj:'retasu', f:'laitue', cat:'Animaux, fruits & légumes'},
+  {w:'ピーマン', r:'', rj:'piiman', f:'poivron', cat:'Animaux, fruits & légumes'},
+  {w:'きのこ', r:'', rj:'kinoko', f:'champignon', cat:'Animaux, fruits & légumes'},
+  {w:'にんにく', r:'', rj:'ninniku', f:'ail', cat:'Animaux, fruits & légumes'},
+  {w:'かぼちゃ', r:'', rj:'kabocha', f:'citrouille', cat:'Animaux, fruits & légumes'},
+  {w:'まめ', r:'', rj:'mame', f:'pois', cat:'Animaux, fruits & légumes'},
+  {w:'くるま', r:'', rj:'kuruma', f:'voiture', cat:'Objets du quotidien'},
+  {w:'じてんしゃ', r:'', rj:'jitensha', f:'bicyclette', cat:'Objets du quotidien'},
+  {w:'カメラ', r:'', rj:'kamera', f:'appareil photo', cat:'Objets du quotidien'},
+  {w:'しんぶん', r:'', rj:'shinbun', f:'journal', cat:'Objets du quotidien'},
+  {w:'たばこ', r:'', rj:'tabako', f:'cigarette', cat:'Objets du quotidien'},
+  {w:'きって', r:'', rj:'kitte', f:'timbre', cat:'Objets du quotidien'},
+  {w:'えんぴつ', r:'', rj:'enpitsu', f:'crayon', cat:'Objets du quotidien'},
+  {w:'きょうしつ', r:'', rj:'kyōshitsu', f:'salle de classe', cat:'Objets du quotidien'},
+  {w:'にわ', r:'', rj:'niwa', f:'jardin', cat:'Objets du quotidien'},
+  {w:'たてもの', r:'', rj:'tatemono', f:'bâtiment', cat:'Objets du quotidien'},
+  {w:'びょういん', r:'', rj:'byōin', f:'hôpital', cat:'Objets du quotidien'},
+  {w:'トイレ', r:'', rj:'toire', f:'WC', cat:'Objets du quotidien'},
+  {w:'いえ', r:'', rj:'ie', f:'maison', cat:'Objets du quotidien'},
+  {w:'かみ', r:'', rj:'kami', f:'papier', cat:'Objets du quotidien'},
+  {w:'にく', r:'', rj:'niku', f:'viande', cat:'Objets du quotidien'},
+  {w:'くだもの', r:'', rj:'kudamono', f:'fruits', cat:'Objets du quotidien'},
+  {w:'やさい', r:'', rj:'yasai', f:'légumes', cat:'Objets du quotidien'},
+  {w:'レストラン', r:'', rj:'resutoran', f:'restaurant', cat:'Objets du quotidien'},
+  {w:'おかし', r:'', rj:'o-kashi', f:'bonbon, confiserie', cat:'Objets du quotidien'},
+  {w:'おちゃ', r:'', rj:'o-cha', f:'thé', cat:'Objets du quotidien'},
+  {w:'コーヒー', r:'', rj:'kōhii', f:'café', cat:'Objets du quotidien'},
+  {w:'ごはん', r:'', rj:'gohan', f:'riz (cuit)', cat:'Objets du quotidien'},
+  {w:'こめ', r:'', rj:'kome', f:'riz (non cuit)', cat:'Objets du quotidien'},
+  {w:'パン', r:'', rj:'pan', f:'pain', cat:'Objets du quotidien'},
+  {w:'スープ', r:'', rj:'sūpu', f:'soupe', cat:'Objets du quotidien'},
+  {w:'えいが', r:'', rj:'eiga', f:'film', cat:'Objets du quotidien'},
+  {w:'てがみ', r:'', rj:'tegami', f:'carte postale, lettre', cat:'Objets du quotidien'},
+  {w:'やすみ', r:'', rj:'yasumi', f:'repos', cat:'Objets du quotidien'},
+  {w:'パーティー', r:'', rj:'paatii', f:'fête', cat:'Objets du quotidien'},
+  {w:'ざっし', r:'', rj:'zasshi', f:'magazine', cat:'Objets du quotidien'},
+  {w:'あさ', r:'', rj:'asa', f:'matin', cat:'Objets du quotidien'},
+  {w:'ひる', r:'', rj:'hiru', f:'midi', cat:'Objets du quotidien'},
+  {w:'ゆうがた', r:'', rj:'yūgata', f:'soirée', cat:'Objets du quotidien'},
+  {w:'よる', r:'', rj:'yoru', f:'nuit', cat:'Objets du quotidien'},
+  {w:'どういたしまして', r:'', rj:'dō itashimashite', f:'de rien', cat:'Expressions de base'},
+  {w:'さようなら', r:'', rj:'sayōnara', f:'au revoir', cat:'Expressions de base'},
+  {w:'おねがいします', r:'', rj:'onegai shimasu', f:'s\'il vous plaît', cat:'Expressions de base'},
+  {w:'どうぞ', r:'', rj:'dōzo', f:'après vous, je vous en prie', cat:'Expressions de base'},
+  {w:'そうです', r:'', rj:'sō desu', f:'c\'est cela', cat:'Expressions de base'},
+  {w:'わかりました', r:'', rj:'wakarimashita', f:'j\'ai compris', cat:'Expressions de base'},
+  {w:'わかりません', r:'', rj:'wakarimasen', f:'je ne comprends pas', cat:'Expressions de base'},
+  {w:'すみません', r:'', rj:'sumimasen', f:'pardon, excusez-moi', cat:'Expressions de base'},
+  {w:'一時', r:'いちじ', rj:'ichi ji', f:'1 heure', cat:'Heures & minutes'},
+  {w:'二時', r:'にじ', rj:'ni ji', f:'2 heures', cat:'Heures & minutes'},
+  {w:'三時', r:'さんじ', rj:'san ji', f:'3 heures', cat:'Heures & minutes'},
+  {w:'四時', r:'よじ', rj:'yo ji', f:'4 heures', cat:'Heures & minutes'},
+  {w:'五時', r:'ごじ', rj:'go ji', f:'5 heures', cat:'Heures & minutes'},
+  {w:'六時', r:'ろくじ', rj:'roku ji', f:'6 heures', cat:'Heures & minutes'},
+  {w:'七時', r:'しちじ', rj:'shichi ji', f:'7 heures', cat:'Heures & minutes'},
+  {w:'八時', r:'はちじ', rj:'hachi ji', f:'8 heures', cat:'Heures & minutes'},
+  {w:'九時', r:'くじ', rj:'ku ji', f:'9 heures', cat:'Heures & minutes'},
+  {w:'十時', r:'じゅうじ', rj:'jū ji', f:'10 heures', cat:'Heures & minutes'},
+  {w:'十一時', r:'じゅういちじ', rj:'jū ichi ji', f:'11 heures', cat:'Heures & minutes'},
+  {w:'十二時', r:'じゅうにじ', rj:'jū ni ji', f:'12 heures', cat:'Heures & minutes'},
+  {w:'何時', r:'なんじ', rj:'nan ji', f:'quelle heure ?', cat:'Heures & minutes'},
+  {w:'一分', r:'いっぷん', rj:'ippun', f:'1 minute', cat:'Heures & minutes'},
+  {w:'二分', r:'にふん', rj:'ni fun', f:'2 minutes', cat:'Heures & minutes'},
+  {w:'三分', r:'さんぷん', rj:'san pun', f:'3 minutes', cat:'Heures & minutes'},
+  {w:'四分', r:'よんぷん', rj:'yon pun', f:'4 minutes', cat:'Heures & minutes'},
+  {w:'五分', r:'ごふん', rj:'go fun', f:'5 minutes', cat:'Heures & minutes'},
+  {w:'六分', r:'ろっぷん', rj:'roppun', f:'6 minutes', cat:'Heures & minutes'},
+  {w:'七分', r:'ななふん', rj:'nana fun', f:'7 minutes', cat:'Heures & minutes'},
+  {w:'八分', r:'はっぷん', rj:'happun', f:'8 minutes', cat:'Heures & minutes'},
+  {w:'九分', r:'きゅうふん', rj:'kyū fun', f:'9 minutes', cat:'Heures & minutes'},
+  {w:'十分', r:'じっぷん', rj:'jippun', f:'10 minutes', cat:'Heures & minutes'},
+  {w:'十一分', r:'じゅういっぷん', rj:'jūippun', f:'11 minutes', cat:'Heures & minutes'},
+  {w:'十二分', r:'じゅうにふん', rj:'jū ni fun', f:'12 minutes', cat:'Heures & minutes'},
+  {w:'何分', r:'なんぷん', rj:'nan pun', f:'combien de minutes ?', cat:'Heures & minutes'},
+  {w:'黄色い', r:'きいろい', rj:'kiiroi', f:'jaune', cat:'Adjectifs (-i)'},
+  {w:'高い', r:'たかい', rj:'takai', f:'haut, cher', cat:'Adjectifs (-i)'},
+  {w:'安い', r:'やすい', rj:'yasui', f:'bon marché', cat:'Adjectifs (-i)'},
+  {w:'低い', r:'ひくい', rj:'hikui', f:'bas', cat:'Adjectifs (-i)'},
+  {w:'新しい', r:'あたらしい', rj:'atarashii', f:'neuf', cat:'Adjectifs (-i)'},
+  {w:'古い', r:'ふるい', rj:'furui', f:'vieux', cat:'Adjectifs (-i)'},
+  {w:'暗い', r:'くらい', rj:'kurai', f:'sombre', cat:'Adjectifs (-i)'},
+  {w:'明るい', r:'あかるい', rj:'akarui', f:'clair', cat:'Adjectifs (-i)'},
+  {w:'小さい', r:'ちいさい', rj:'chiisai', f:'petit', cat:'Adjectifs (-i)'},
+  {w:'大きい', r:'おおきい', rj:'ookii', f:'grand', cat:'Adjectifs (-i)'},
+  {w:'やさしい', r:'', rj:'yasashii', f:'facile', cat:'Adjectifs (-i)'},
+  {w:'むずかしい', r:'', rj:'muzukashii', f:'difficile', cat:'Adjectifs (-i)'},
+  {w:'白い', r:'しろい', rj:'shiroi', f:'blanc', cat:'Adjectifs (-i)'},
+  {w:'赤い', r:'あかい', rj:'akai', f:'rouge', cat:'Adjectifs (-i)'},
+  {w:'青い', r:'あおい', rj:'aoi', f:'bleu', cat:'Adjectifs (-i)'},
+  {w:'黒い', r:'くろい', rj:'kuroi', f:'noir', cat:'Adjectifs (-i)'},
+  {w:'安全な', r:'あんぜんな', rj:'anzen-na', f:'sûr', cat:'Adjectifs (-na)'},
+  {w:'上手な', r:'じょうずな', rj:'jōzu-na', f:'adroit', cat:'Adjectifs (-na)'},
+  {w:'下手な', r:'へたな', rj:'heta-na', f:'maladroit', cat:'Adjectifs (-na)'},
+  {w:'大切な', r:'たいせつな', rj:'taisetsu-na', f:'important', cat:'Adjectifs (-na)'},
+  {w:'有名な', r:'ゆうめいな', rj:'yūmei-na', f:'célèbre', cat:'Adjectifs (-na)'},
+  {w:'大丈夫な', r:'だいじょうぶな', rj:'daijōbu-na', f:'sans problème', cat:'Adjectifs (-na)'},
+  {w:'好きな', r:'すきな', rj:'suki-na', f:'aimé', cat:'Adjectifs (-na)'},
+  {w:'きらいな', r:'', rj:'kirai-na', f:'détesté', cat:'Adjectifs (-na)'},
+  {w:'大変な', r:'たいへんな', rj:'taihen-na', f:'difficile, sérieux', cat:'Adjectifs (-na)'},
+  {w:'しずかな', r:'', rj:'shizuka-na', f:'tranquille', cat:'Adjectifs (-na)'},
+  {w:'きれいな', r:'', rj:'kirei-na', f:'beau', cat:'Adjectifs (-na)'},
+  {w:'ひまな', r:'', rj:'hima-na', f:'libre', cat:'Adjectifs (-na)'},
+  {w:'丈夫な', r:'じょうぶな', rj:'jōbu-na', f:'sain, vigoureux', cat:'Adjectifs (-na)'},
+  {w:'元気な', r:'げんきな', rj:'genki-na', f:'fort, animé', cat:'Adjectifs (-na)'},
+  {w:'親切な', r:'しんせつな', rj:'shinsetsu-na', f:'aimable', cat:'Adjectifs (-na)'},
+  {w:'危険な', r:'きけんな', rj:'kiken-na', f:'dangereux', cat:'Adjectifs (-na)'},
+  {w:'安くない', r:'やすくない', rj:'yasukunai', f:'n\'est pas bon marché', cat:'Conjugaison des adjectifs'},
+  {w:'安かった', r:'やすかった', rj:'yasukatta', f:'était bon marché', cat:'Conjugaison des adjectifs'},
+  {w:'安くなかった', r:'やすくなかった', rj:'yasukunakatta', f:'n\'était pas bon marché', cat:'Conjugaison des adjectifs'},
+  {w:'有名じゃない', r:'ゆうめいじゃない', rj:'yūmei ja nai', f:'n\'est pas célèbre', cat:'Conjugaison des adjectifs'},
+  {w:'有名だった', r:'ゆうめいだった', rj:'yūmei datta', f:'était célèbre', cat:'Conjugaison des adjectifs'},
+  {w:'有名じゃなかった', r:'ゆうめいじゃなかった', rj:'yūmei ja nakatta', f:'n\'était pas célèbre', cat:'Conjugaison des adjectifs'},
+  {w:'本屋', r:'ほんや', rj:'hon\'ya', f:'librairie', cat:'Magasins et restaurants'},
+  {w:'文房具屋', r:'ぶんぼうぐや', rj:'bunbōguya', f:'papeterie', cat:'Magasins et restaurants'},
+  {w:'肉屋', r:'にくや', rj:'nikuya', f:'boucherie', cat:'Magasins et restaurants'},
+  {w:'魚屋', r:'さかなや', rj:'sakanaya', f:'poissonnerie', cat:'Magasins et restaurants'},
+  {w:'八百屋', r:'やおや', rj:'yaoya', f:'maraîcher', cat:'Magasins et restaurants'},
+  {w:'果物屋', r:'くだものや', rj:'kudamonoya', f:'marchand de fruits', cat:'Magasins et restaurants'},
+  {w:'パン屋', r:'パンや', rj:'pan\'ya', f:'boulangerie', cat:'Magasins et restaurants'},
+  {w:'ケーキ屋', r:'ケーキや', rj:'keekiya', f:'pâtisserie', cat:'Magasins et restaurants'},
+  {w:'おかし屋', r:'おかしや', rj:'o-kashiya', f:'confiserie', cat:'Magasins et restaurants'},
+  {w:'電気屋', r:'でんきや', rj:'denkiya', f:'magasin d\'électronique', cat:'Magasins et restaurants'},
+  {w:'くつ屋', r:'くつや', rj:'kutsuya', f:'magasin de chaussures', cat:'Magasins et restaurants'},
+  {w:'居酒屋', r:'いざかや', rj:'izakaya', f:'bar-restaurant', cat:'Magasins et restaurants'},
+  {w:'お弁当屋', r:'おべんとうや', rj:'o-bentōya', f:'magasin de bentō', cat:'Magasins et restaurants'},
+  {w:'すし屋', r:'すしや', rj:'sushiya', f:'restaurant de sushi', cat:'Magasins et restaurants'},
+  {w:'ラーメン屋', r:'ラーメンや', rj:'raamenya', f:'restaurant de ramen', cat:'Magasins et restaurants'},
+  {w:'うどん屋', r:'うどんや', rj:'udon\'ya', f:'restaurant de udon', cat:'Magasins et restaurants'},
+  {w:'は', r:'', rj:'ha (wa)', f:'thème : de quoi on parle', cat:'Particules grammaticales'},
+  {w:'が', r:'', rj:'ga', f:'sujet', cat:'Particules grammaticales'},
+  {w:'の', r:'', rj:'no', f:'possessif ; fin de phrase (question/déclaration informelle)', cat:'Particules grammaticales'},
+  {w:'に', r:'', rj:'ni', f:'contact direct / lieu / complément indirect', cat:'Particules grammaticales'},
+  {w:'で', r:'', rj:'de', f:'lieu de l\'action / moyen', cat:'Particules grammaticales'},
+  {w:'へ', r:'', rj:'he (e)', f:'direction', cat:'Particules grammaticales'},
+  {w:'を', r:'', rj:'wo (o)', f:'complément direct', cat:'Particules grammaticales'},
+  {w:'と', r:'', rj:'to', f:'avec, et ; citation', cat:'Particules grammaticales'},
+  {w:'か', r:'', rj:'ka', f:'particule de question', cat:'Particules grammaticales'},
+  {w:'ね', r:'', rj:'ne', f:'confirmation ; invitation', cat:'Particules grammaticales'},
+  {w:'よ', r:'', rj:'yo', f:'emphase, affirmation ; invitation', cat:'Particules grammaticales'},
+  {w:'さ', r:'', rj:'sa', f:'emphase, affirmation (familier)', cat:'Particules grammaticales'},
+  {w:'ぞ', r:'', rj:'zo', f:'emphase, affirmation (masc., informel)', cat:'Particules grammaticales'},
+  {w:'ぜ', r:'', rj:'ze', f:'emphase ; invitation (masc., informel)', cat:'Particules grammaticales'},
+  {w:'な', r:'', rj:'na', f:'affirmation, désir (masc.) ; impératif négatif', cat:'Particules grammaticales'},
+  {w:'わ', r:'', rj:'wa', f:'déclaration emphatique (fém.)', cat:'Particules grammaticales'},
+  {w:'います', r:'', rj:'imasu', f:'il y a (personnes, animaux) - présent poli', cat:'Existence : iru / aru'},
+  {w:'いました', r:'', rj:'imashita', f:'il y avait - passé poli', cat:'Existence : iru / aru'},
+  {w:'いません', r:'', rj:'imasen', f:'il n\'y a pas - négatif poli', cat:'Existence : iru / aru'},
+  {w:'いませんでした', r:'', rj:'imasendeshita', f:'il n\'y avait pas - négatif passé poli', cat:'Existence : iru / aru'},
+  {w:'いる', r:'', rj:'iru', f:'il y a (personnes, animaux) - forme simple', cat:'Existence : iru / aru'},
+  {w:'いた', r:'', rj:'ita', f:'il y avait - forme simple', cat:'Existence : iru / aru'},
+  {w:'いない', r:'', rj:'inai', f:'il n\'y a pas - forme simple', cat:'Existence : iru / aru'},
+  {w:'いなかった', r:'', rj:'inakatta', f:'il n\'y avait pas - forme simple', cat:'Existence : iru / aru'},
+  {w:'あります', r:'', rj:'arimasu', f:'il y a (choses, plantes) - présent poli', cat:'Existence : iru / aru'},
+  {w:'ありました', r:'', rj:'arimashita', f:'il y avait - passé poli', cat:'Existence : iru / aru'},
+  {w:'ありません', r:'', rj:'arimasen', f:'il n\'y a pas - négatif poli', cat:'Existence : iru / aru'},
+  {w:'ありませんでした', r:'', rj:'arimasendeshita', f:'il n\'y avait pas - négatif passé poli', cat:'Existence : iru / aru'},
+  {w:'ある', r:'', rj:'aru', f:'il y a (choses, plantes) - forme simple', cat:'Existence : iru / aru'},
+  {w:'あった', r:'', rj:'atta', f:'il y avait - forme simple', cat:'Existence : iru / aru'},
+  {w:'ない', r:'', rj:'nai', f:'il n\'y a pas - forme simple', cat:'Existence : iru / aru'},
+  {w:'なかった', r:'', rj:'nakatta', f:'il n\'y avait pas - forme simple', cat:'Existence : iru / aru'},
+  {w:'貸す', r:'かす', f:'prêter', cat:'Verbes'},
+  {w:'起きる', r:'おきる', f:'se lever', cat:'Verbes'},
+  {w:'教える', r:'おしえる', f:'enseigner', cat:'Verbes'},
+  {w:'急ぐ', r:'いそぐ', f:'se dépêcher', cat:'Verbes'},
+  {w:'死ぬ', r:'しぬ', f:'mourir', cat:'Verbes'},
+  {w:'教えます', r:'おしえます', rj:'oshiemasu', f:'enseigner (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'教えました', r:'おしえました', rj:'oshiemashita', f:'enseigner (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'教えません', r:'おしえません', rj:'oshiemasen', f:'enseigner (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'教えませんでした', r:'おしえませんでした', rj:'oshiemasendeshita', f:'enseigner (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'起きます', r:'おきます', rj:'okimasu', f:'se lever (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'起きました', r:'おきました', rj:'okimashita', f:'se lever (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'起きません', r:'おきません', rj:'okimasen', f:'se lever (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'起きませんでした', r:'おきませんでした', rj:'okimasendeshita', f:'se lever (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'貸します', r:'かします', rj:'kashimasu', f:'prêter (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'貸しました', r:'かしました', rj:'kashimashita', f:'prêter (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'貸しません', r:'かしません', rj:'kashimasen', f:'prêter (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'貸しませんでした', r:'かしませんでした', rj:'kashimasendeshita', f:'prêter (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'待ちます', r:'まちます', rj:'machimasu', f:'attendre (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'待ちました', r:'まちました', rj:'machimashita', f:'attendre (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'待ちません', r:'まちません', rj:'machimasen', f:'attendre (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'待ちませんでした', r:'まちませんでした', rj:'machimasendeshita', f:'attendre (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'買います', r:'かいます', rj:'kaimasu', f:'acheter (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'買いました', r:'かいました', rj:'kaimashita', f:'acheter (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'買いません', r:'かいません', rj:'kaimasen', f:'acheter (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'買いませんでした', r:'かいませんでした', rj:'kaimasendeshita', f:'acheter (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'帰ります', r:'かえります', rj:'kaerimasu', f:'retourner, rentrer (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'帰りました', r:'かえりました', rj:'kaerimashita', f:'retourner, rentrer (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'帰りません', r:'かえりません', rj:'kaerimasen', f:'retourner, rentrer (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'帰りませんでした', r:'かえりませんでした', rj:'kaerimasendeshita', f:'retourner, rentrer (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'書きます', r:'かきます', rj:'kakimasu', f:'écrire (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'書きました', r:'かきました', rj:'kakimashita', f:'écrire (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'書きません', r:'かきません', rj:'kakimasen', f:'écrire (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'書きませんでした', r:'かきませんでした', rj:'kakimasendeshita', f:'écrire (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'急ぎます', r:'いそぎます', rj:'isogimasu', f:'se dépêcher (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'急ぎました', r:'いそぎました', rj:'isogimashita', f:'se dépêcher (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'急ぎません', r:'いそぎません', rj:'isogimasen', f:'se dépêcher (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'急ぎませんでした', r:'いそぎませんでした', rj:'isogimasendeshita', f:'se dépêcher (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'遊びます', r:'あそびます', rj:'asobimasu', f:'jouer (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'遊びました', r:'あそびました', rj:'asobimashita', f:'jouer (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'遊びません', r:'あそびません', rj:'asobimasen', f:'jouer (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'遊びませんでした', r:'あそびませんでした', rj:'asobimasendeshita', f:'jouer (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'飲みます', r:'のみます', rj:'nomimasu', f:'boire (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'飲みました', r:'のみました', rj:'nomimashita', f:'boire (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'飲みません', r:'のみません', rj:'nomimasen', f:'boire (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'飲みませんでした', r:'のみませんでした', rj:'nomimasendeshita', f:'boire (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'死にます', r:'しにます', rj:'shinimasu', f:'mourir (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'死にました', r:'しにました', rj:'shinimashita', f:'mourir (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'死にません', r:'しにません', rj:'shinimasen', f:'mourir (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'死にませんでした', r:'しにませんでした', rj:'shinimasendeshita', f:'mourir (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'します', r:'', rj:'shimasu', f:'faire (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'しました', r:'', rj:'shimashita', f:'faire (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'しません', r:'', rj:'shimasen', f:'faire (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'しませんでした', r:'', rj:'shimasendeshita', f:'faire (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'来ます', r:'きます', rj:'kimasu', f:'venir (présent poli)', cat:'Conjugaison : forme polie'},
+  {w:'来ました', r:'きました', rj:'kimashita', f:'venir (passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'来ません', r:'きません', rj:'kimasen', f:'venir (négatif poli)', cat:'Conjugaison : forme polie'},
+  {w:'来ませんでした', r:'きませんでした', rj:'kimasendeshita', f:'venir (négatif passé poli)', cat:'Conjugaison : forme polie'},
+  {w:'教えた', r:'おしえた', rj:'oshieta', f:'enseigner (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'教えない', r:'おしえない', rj:'oshienai', f:'enseigner (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'教えなかった', r:'おしえなかった', rj:'oshienakatta', f:'enseigner (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'起きた', r:'おきた', rj:'okita', f:'se lever (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'起きない', r:'おきない', rj:'okinai', f:'se lever (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'起きなかった', r:'おきなかった', rj:'okinakatta', f:'se lever (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'貸した', r:'かした', rj:'kashita', f:'prêter (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'貸さない', r:'かさない', rj:'kasanai', f:'prêter (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'貸さなかった', r:'かさなかった', rj:'kasanakatta', f:'prêter (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'待った', r:'まった', rj:'matta', f:'attendre (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'待たない', r:'またない', rj:'matanai', f:'attendre (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'待たなかった', r:'またなかった', rj:'matanakatta', f:'attendre (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'買った', r:'かった', rj:'katta', f:'acheter (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'買わない', r:'かわない', rj:'kawanai', f:'acheter (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'買わなかった', r:'かわなかった', rj:'kawanakatta', f:'acheter (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'帰った', r:'かえった', rj:'kaetta', f:'retourner, rentrer (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'帰らない', r:'かえらない', rj:'kaeranai', f:'retourner, rentrer (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'帰らなかった', r:'かえらなかった', rj:'kaeranakatta', f:'retourner, rentrer (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'書いた', r:'かいた', rj:'kaita', f:'écrire (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'書かない', r:'かかない', rj:'kakanai', f:'écrire (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'書かなかった', r:'かかなかった', rj:'kakanakatta', f:'écrire (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'急いだ', r:'いそいだ', rj:'isoida', f:'se dépêcher (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'急がない', r:'いそがない', rj:'isoganai', f:'se dépêcher (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'急がなかった', r:'いそがなかった', rj:'isoganakatta', f:'se dépêcher (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'遊んだ', r:'あそんだ', rj:'asonda', f:'jouer (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'遊ばない', r:'あそばない', rj:'asobanai', f:'jouer (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'遊ばなかった', r:'あそばなかった', rj:'asobanakatta', f:'jouer (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'飲んだ', r:'のんだ', rj:'nonda', f:'boire (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'飲まない', r:'のまない', rj:'nomanai', f:'boire (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'飲まなかった', r:'のまなかった', rj:'nomanakatta', f:'boire (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'死んだ', r:'しんだ', rj:'shinda', f:'mourir (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'死なない', r:'しなない', rj:'shinanai', f:'mourir (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'死ななかった', r:'しななかった', rj:'shinanakatta', f:'mourir (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'した', r:'', rj:'shita', f:'faire (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'しない', r:'', rj:'shinai', f:'faire (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'しなかった', r:'', rj:'shinakatta', f:'faire (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'来た', r:'きた', rj:'kita', f:'venir (passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'来ない', r:'こない', rj:'konai', f:'venir (négatif simple)', cat:'Conjugaison : forme simple'},
+  {w:'来なかった', r:'こなかった', rj:'konakatta', f:'venir (négatif passé simple)', cat:'Conjugaison : forme simple'},
+  {w:'祖父', r:'そふ', f:'mon grand-père', cat:'Famille (soi-meme)'},
+  {w:'祖母', r:'そぼ', f:'ma grand-mère', cat:'Famille (soi-meme)'},
+  {w:'おば', r:'おば', f:'ma tante', cat:'Famille (soi-meme)'},
+  {w:'父', r:'ちち', f:'mon père', cat:'Famille (soi-meme)'},
+  {w:'母', r:'はは', f:'ma mère', cat:'Famille (soi-meme)'},
+  {w:'おじ', r:'おじ', f:'mon oncle', cat:'Famille (soi-meme)'},
+  {w:'兄', r:'あに', f:'mon grand frère', cat:'Famille (soi-meme)'},
+  {w:'姉', r:'あね', f:'ma grande sœur', cat:'Famille (soi-meme)'},
+  {w:'弟', r:'おとうと', f:'mon petit frère', cat:'Famille (soi-meme)'},
+  {w:'妹', r:'いもうと', f:'ma petite sœur', cat:'Famille (soi-meme)'},
+  {w:'夫', r:'おっと', f:'mon mari', cat:'Famille (soi-meme)'},
+  {w:'妻', r:'つま', f:'ma femme', cat:'Famille (soi-meme)'},
+  {w:'娘', r:'むすめ', f:'ma fille', cat:'Famille (soi-meme)'},
+  {w:'息子', r:'むすこ', f:'mon fils', cat:'Famille (soi-meme)'},
+  {w:'いとこ', r:'いとこ', f:'cousin, cousine', cat:'Famille (soi-meme)'},
+  {w:'おい', r:'おい', f:'neveu', cat:'Famille (soi-meme)'},
+  {w:'めい', r:'めい', f:'nièce', cat:'Famille (soi-meme)'},
+  {w:'おじいさん', r:'', rj:'ojiisan', f:'grand-père', cat:'Famille (famille d\'autrui)'},
+  {w:'おばあさん', r:'', rj:'obaasan', f:'grand-mère', cat:'Famille (famille d\'autrui)'},
+  {w:'おばさん', r:'', rj:'obasan', f:'tante', cat:'Famille (famille d\'autrui)'},
+  {w:'お父さん', r:'おとうさん', rj:'otōsan', f:'père', cat:'Famille (famille d\'autrui)'},
+  {w:'お母さん', r:'おかあさん', rj:'okaasan', f:'mère', cat:'Famille (famille d\'autrui)'},
+  {w:'おじさん', r:'', rj:'ojisan', f:'oncle', cat:'Famille (famille d\'autrui)'},
+  {w:'お兄さん', r:'おにいさん', rj:'oniisan', f:'grand frère', cat:'Famille (famille d\'autrui)'},
+  {w:'お姉さん', r:'おねえさん', rj:'oneesan', f:'grande sœur', cat:'Famille (famille d\'autrui)'},
+  {w:'弟さん', r:'おとうとさん', rj:'otōtosan', f:'petit frère', cat:'Famille (famille d\'autrui)'},
+  {w:'妹さん', r:'いもうとさん', rj:'imōtosan', f:'petite sœur', cat:'Famille (famille d\'autrui)'},
+  {w:'だんなさん', r:'', rj:'dannasan', f:'mari', cat:'Famille (famille d\'autrui)'},
+  {w:'奥さん', r:'おくさん', rj:'okusan', f:'femme', cat:'Famille (famille d\'autrui)'},
+  {w:'娘さん', r:'むすめさん', rj:'musumesan', f:'fille', cat:'Famille (famille d\'autrui)'},
+  {w:'息子さん', r:'むすこさん', rj:'musukosan', f:'fils', cat:'Famille (famille d\'autrui)'},
+  {w:'新しく', r:'あたらしく', rj:'atarashiku', f:'nouvellement', cat:'Adverbes'},
+  {w:'強く', r:'つよく', rj:'tsuyoku', f:'fortement', cat:'Adverbes'},
+  {w:'大きく', r:'おおきく', rj:'ookiku', f:'grandement', cat:'Adverbes'},
+  {w:'便利に', r:'べんりに', rj:'benri ni', f:'pratiquement', cat:'Adverbes'},
+  {w:'静かに', r:'しずかに', rj:'shizuka ni', f:'tranquillement', cat:'Adverbes'},
+  {w:'簡単に', r:'かんたんに', rj:'kantan ni', f:'facilement', cat:'Adverbes'},
+  {w:'ゆっくり', r:'', rj:'yukkuri', f:'lentement', cat:'Adverbes'},
+  {w:'よく', r:'', rj:'yoku', f:'beaucoup, bien', cat:'Adverbes'},
+  {w:'どんなに', r:'', rj:'donna ni', f:'comment ?', cat:'Adverbes'},
+  {w:'いくら', r:'', rj:'ikura', f:'combien ?', cat:'Adverbes'},
+  {w:'とても', r:'', rj:'totemo', f:'très', cat:'Adverbes'},
+  {w:'充分', r:'じゅうぶん', rj:'jūbun', f:'assez', cat:'Adverbes'},
+  {w:'大変', r:'たいへん', rj:'taihen', f:'très, beaucoup', cat:'Adverbes'},
+  {w:'たくさん', r:'', rj:'takusan', f:'beaucoup', cat:'Adverbes'},
+  {w:'だけ', r:'', rj:'dake', f:'seulement', cat:'Adverbes'},
+  {w:'少し', r:'すこし', rj:'sukoshi', f:'un peu', cat:'Adverbes'},
+  {w:'ちょっと', r:'', rj:'chotto', f:'un peu', cat:'Adverbes'},
+  {w:'もっと', r:'', rj:'motto', f:'plus', cat:'Adverbes'},
+  {w:'今', r:'いま', rj:'ima', f:'maintenant', cat:'Adverbes'},
+  {w:'今日', r:'きょう', rj:'kyō', f:'aujourd\'hui', cat:'Adverbes'},
+  {w:'昨日', r:'きのう', rj:'kinō', f:'hier', cat:'Adverbes'},
+  {w:'明日', r:'あした', rj:'ashita', f:'demain', cat:'Adverbes'},
+  {w:'まだ', r:'', rj:'mada', f:'pas encore', cat:'Adverbes'},
+  {w:'もう', r:'', rj:'mō', f:'déjà', cat:'Adverbes'},
+  {w:'いつ', r:'', rj:'itsu', f:'quand ?', cat:'Adverbes'},
+  {w:'下に', r:'したに', rj:'shita ni', f:'sous', cat:'Adverbes'},
+  {w:'上に', r:'うえに', rj:'ue ni', f:'sur', cat:'Adverbes'},
+  {w:'そばに', r:'', rj:'soba ni', f:'à côté', cat:'Adverbes'},
+  {w:'前に', r:'まえに', rj:'mae ni', f:'devant', cat:'Adverbes'},
+  {w:'後ろに', r:'うしろに', rj:'ushiro ni', f:'derrière', cat:'Adverbes'},
+  {w:'きっと', r:'', rj:'kitto', f:'sûrement', cat:'Adverbes'},
+  {w:'はえ', r:'', rj:'hae', f:'mouche', cat:'Animaux, fruits & légumes'},
+  {w:'蚊', r:'か', f:'moustique', cat:'Animaux, fruits & légumes'},
+  {w:'亀', r:'かめ', f:'tortue', cat:'Animaux, fruits & légumes'},
+  {w:'ちょう', r:'', rj:'chō', f:'papillon', cat:'Animaux, fruits & légumes'},
+  {w:'さめ', r:'', rj:'same', f:'requin', cat:'Animaux, fruits & légumes'},
+  {w:'かえる', r:'', rj:'kaeru', f:'grenouille', cat:'Animaux, fruits & légumes'},
+  {w:'くじら', r:'', rj:'kujira', f:'baleine', cat:'Animaux, fruits & légumes'},
+  {w:'からす', r:'', rj:'karasu', f:'corbeau', cat:'Animaux, fruits & légumes'},
+  {w:'財布', r:'さいふ', f:'portefeuille', cat:'Objets du quotidien'},
+  {w:'めがね', r:'', rj:'megane', f:'lunettes', cat:'Objets du quotidien'},
+  {w:'はし', r:'', rj:'hashi', f:'baguettes', cat:'Objets du quotidien'},
+  {w:'コップ', r:'', rj:'koppu', f:'tasse', cat:'Objets du quotidien'},
+  {w:'皿', r:'さら', f:'assiette', cat:'Objets du quotidien'},
+  {w:'フォーク', r:'', rj:'fōku', f:'fourchette', cat:'Objets du quotidien'},
+  {w:'スプーン', r:'', rj:'supūn', f:'cuillère', cat:'Objets du quotidien'},
+  {w:'ナイフ', r:'', rj:'naifu', f:'couteau', cat:'Objets du quotidien'},,
+  // --- Ajouts (liste Kanji N5 + vocabulaire de cours) ---
+  {w:'車', r:'くるま', f:'voiture', cat:'Kanji utiles'},
+  {w:'門', r:'もん', f:'porte, portail', cat:'Kanji utiles'},
+  {w:'天', r:'てん', f:'ciel', cat:'Kanji utiles'},
+  {w:'気', r:'き', f:'esprit, énergie', cat:'Kanji utiles'},
+  {w:'万', r:'まん', f:'dix mille', cat:'Kanji utiles'},
+  {w:'年', r:'とし', f:'année', cat:'Kanji utiles'},
+  {w:'半', r:'はん', f:'moitié', cat:'Kanji utiles'},
+  {w:'分', r:'ふん', f:'minute, partie', cat:'Kanji utiles'},
+  {w:'間', r:'あいだ', f:'intervalle, espace', cat:'Kanji utiles'},
+  {w:'岩', r:'いわ', f:'rocher', cat:'Kanji utiles'},
+  {w:'畑', r:'はたけ', f:'champ cultivé', cat:'Kanji utiles'},
+  {w:'森', r:'もり', f:'forêt', cat:'Kanji utiles'},
+  {w:'毎', r:'まい', f:'chaque', cat:'Kanji utiles'},
+  {w:'語', r:'ご', f:'langue, mot', cat:'Kanji utiles'},
+  {w:'足', r:'あし', f:'pied, jambe', cat:'Kanji utiles'},
+  {w:'体', r:'からだ', f:'corps', cat:'Kanji utiles'},
+  {w:'力', r:'ちから', f:'force, pouvoir', cat:'Kanji utiles'},
+  {w:'外', r:'そと', f:'dehors', cat:'Kanji utiles'},
+  {w:'駅', r:'えき', f:'gare', cat:'Kanji utiles'},
+  {w:'会', r:'かい', f:'réunion, rencontre', cat:'Kanji utiles'},
+  {w:'内', r:'うち', f:'intérieur, dedans', cat:'Kanji utiles'},
+  {w:'友', r:'とも', f:'ami', cat:'Kanji utiles'},
+  {w:'聞く', r:'きく', f:'entendre, écouter', cat:'Verbes'},
+  {w:'話す', r:'はなす', f:'parler', cat:'Verbes'},
+  {w:'長い', r:'ながい', f:'long', cat:'Adjectifs (-i)'},
+  {w:'いい', r:'いい', f:'bon', cat:'Adjectifs (-i)'},
+  {w:'かっこいい', r:'かっこいい', f:'cool, classe, chic', cat:'Adjectifs (-i)'},
+  {w:'面白い', r:'おもしろい', f:'intéressant', cat:'Adjectifs (-i)'},
+  {w:'楽しい', r:'たのしい', f:'agréable', cat:'Adjectifs (-i)'},
+  {w:'辛い', r:'からい', f:'épicé', cat:'Adjectifs (-i)'},
+  {w:'きれい', r:'きれい', f:'joli, propre', cat:'Adjectifs (-na)'},
+  {w:'有名', r:'ゆうめい', f:'célèbre', cat:'Adjectifs (-na)'},
+  {w:'嫌い', r:'きらい', f:'pas aimé, détester', cat:'Adjectifs (-na)'},
+  {w:'好き', r:'すき', f:'aimer', cat:'Adjectifs (-na)'},
+  {w:'静か', r:'しずか', f:'calme', cat:'Adjectifs (-na)'},
+  {w:'大切', r:'たいせつ', f:'important', cat:'Adjectifs (-na)'},
+  {w:'どこ', r:'どこ', f:'où', cat:'Interrogatifs & démonstratifs'},
+  {w:'どうして', r:'どうして', f:'pourquoi', cat:'Interrogatifs & démonstratifs'},
+  {w:'どう', r:'どう', f:'comment', cat:'Interrogatifs & démonstratifs'},
+  {w:'どれ', r:'どれ', f:'lequel', cat:'Interrogatifs & démonstratifs'},
+  {w:'誰', r:'だれ', f:'qui', cat:'Interrogatifs & démonstratifs'},
+  {w:'これ', r:'これ', f:'celui-ci (près de moi)', cat:'Interrogatifs & démonstratifs'},
+  {w:'それ', r:'それ', f:'celui-là (près de toi)', cat:'Interrogatifs & démonstratifs'},
+  {w:'あれ', r:'あれ', f:'celui-là (là-bas)', cat:'Interrogatifs & démonstratifs'},
+  {w:'こう', r:'こう', f:'de cette façon-ci', cat:'Interrogatifs & démonstratifs'},
+  {w:'そう', r:'そう', f:'de cette façon-là', cat:'Interrogatifs & démonstratifs'},
+  {w:'うん', r:'うん', f:'oui (familier)', cat:'Vocabulaire (cours)'},
+  {w:'ううん', r:'ううん', f:'non (familier)', cat:'Vocabulaire (cours)'},
+  {w:'大人', r:'おとな', f:'adulte', cat:'Vocabulaire (cours)'},
+  {w:'子供', r:'こども', f:'enfant', cat:'Vocabulaire (cours)'},
+  {w:'友達', r:'ともだち', f:'ami', cat:'Vocabulaire (cours)'},
+  {w:'知り合い', r:'しりあい', f:'connaissance', cat:'Vocabulaire (cours)'},
+  {w:'ミーティング', r:'ミーティング', f:'réunion', cat:'Vocabulaire (cours)'},
+  {w:'仕事', r:'しごと', f:'travail', cat:'Vocabulaire (cours)'},
+  {w:'入口', r:'いりぐち', f:'entrée', cat:'Vocabulaire (cours)'},
+  {w:'出口', r:'でぐち', f:'sortie', cat:'Vocabulaire (cours)'},
+  {w:'図書館', r:'としょかん', f:'bibliothèque', cat:'Vocabulaire (cours)'},
+  {w:'小学校', r:'しょうがっこう', f:'école primaire', cat:'Vocabulaire (cours)'},
+  {w:'中学校', r:'ちゅうがっこう', f:'collège', cat:'Vocabulaire (cours)'},
+  {w:'高校', r:'こうこう', f:'lycée', cat:'Vocabulaire (cours)'},
+  {w:'彼', r:'かれ', f:'il, petit ami', cat:'Vocabulaire (cours)'},
+  {w:'彼女', r:'かのじょ', f:'elle, petite amie', cat:'Vocabulaire (cours)'},
+  {w:'映画', r:'えいが', f:'film', cat:'Vocabulaire (cours)'},
+  {w:'鉛筆', r:'えんぴつ', f:'crayon', cat:'Vocabulaire (cours)'},
+  {w:'料理', r:'りょうり', f:'cuisine', cat:'Vocabulaire (cours)'},
+];
+
+// --- Système de répétition espacée (paliers de type Leitner, avec vraies dates) ---
+// palier 0 = nouveau/à revoir aujourd'hui, palier 5 = maîtrisé
+const INTERVAL_DAYS = [0, 0, 1, 3, 7, 16];
+const STORE_KEY = 'verbes-jp-srs-v2';
+const OLD_KEY = 'verbes-jp-known-v1';
+const DAY = 86400000;
+
+let srs = {}; // { word: { stage, next(ms) } }
+let mode = 'jp2fr', activeCat = 'Toutes';
+let queue = [], flipped = false, showRomaji = false;
+let answered = null, options = [], animate = false;
+
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const cats = () => [...new Set(V.map(v => v.cat))];
+const wordsInCat = () => activeCat === 'Toutes' ? V.map((_, i) => i) : V.map((_, i) => i).filter(i => V[i].cat === activeCat);
+
+function ensure(i) { const w = V[i].w; if (!srs[w]) srs[w] = { stage: 0, next: 0 }; return srs[w]; }
+
+function loadSRS() {
+  try {
+    const s = localStorage.getItem(STORE_KEY);
+    if (s) { srs = JSON.parse(s); return; }
+  } catch (e) {}
+  // migration depuis l'ancienne version (simple "sus / pas sus")
+  try {
+    const old = localStorage.getItem(OLD_KEY);
+    if (old) {
+      const oldKnown = new Set(JSON.parse(old));
+      V.forEach((v, i) => { srs[v.w] = { stage: oldKnown.has(i) ? 3 : 0, next: 0 }; });
+      saveSRS();
+    }
+  } catch (e) {}
+}
+function saveSRS() { try { localStorage.setItem(STORE_KEY, JSON.stringify(srs)); } catch (e) {} }
+
+function isDue(i) { return ensure(i).next <= Date.now(); }
+function markCorrect(i) {
+  const s = ensure(i);
+  s.stage = Math.min(s.stage + 1, 5);
+  s.next = Date.now() + INTERVAL_DAYS[s.stage] * DAY;
+  saveSRS();
+}
+function markWrong(i) {
+  const s = ensure(i);
+  s.stage = 0;
+  s.next = Date.now();
+  saveSRS();
+}
+function stageLabel(i) {
+  const s = ensure(i).stage;
+  return s >= 5 ? 'maîtrisé' : s === 0 ? 'nouveau' : 'palier ' + s;
+}
+
+function startSession(forceAll) {
+  const pool = wordsInCat();
+  queue = shuffle(forceAll ? pool : pool.filter(isDue));
+  flipped = false; answered = null; buildOptions(); render();
+}
+function buildOptions() {
+  if (!queue.length) return;
+  const cur = queue[0];
+  const pool = wordsInCat().filter(i => i !== cur);
+  const others = shuffle(pool.length >= 3 ? pool : V.map((_, i) => i).filter(i => i !== cur)).slice(0, 3);
+  options = shuffle([cur, ...others]);
+}
+function reinsert() { const c = queue.shift(); queue.splice(Math.min(3, queue.length), 0, c); }
+function reading(v) { return v.r || ''; }
+function romajiOf(v) { return v.rj || ''; }
+function readBlock(v) {
+  let h = '';
+  if (reading(v)) h += '<div class="read">' + reading(v) + '</div>';
+  if (showRomaji && romajiOf(v)) h += '<div class="romaji">' + romajiOf(v) + '</div>';
+  return h;
+}
+
+function renderCatbar() {
+  const list = cats();
+  const bar = $('catbar');
+  if (list.length <= 1) { bar.style.display = 'none'; bar.innerHTML = ''; return; }
+  bar.style.display = 'flex';
+  const all = ['Toutes', ...list];
+  bar.innerHTML = all.map(c => '<button data-cat="' + c + '" aria-pressed="' + (c === activeCat) + '">' + c + '</button>').join('');
+  bar.querySelectorAll('button').forEach(b => b.onclick = () => { activeCat = b.dataset.cat; startSession(false); });
+}
+
+function bucket(stage) { return stage === 0 ? 'red' : stage <= 3 ? 'yellow' : 'green'; }
+function statsFor(indices) {
+  const r = { red: 0, yellow: 0, green: 0, total: indices.length };
+  indices.forEach(i => { r[bucket(ensure(i).stage)]++; });
+  return r;
+}
+function segbarHTML(s) {
+  const pct = k => s.total ? (s[k] / s.total * 100) : 0;
+  return '<div class="segbar"><i class="seg-red" style="width:' + pct('red') + '%"></i>' +
+    '<i class="seg-yellow" style="width:' + pct('yellow') + '%"></i>' +
+    '<i class="seg-green" style="width:' + pct('green') + '%"></i></div>';
+}
+function renderStats() {
+  const st = $('stage');
+  const all = V.map((_, i) => i);
+  const overall = statsFor(all);
+  const pctGreen = overall.total ? Math.round(overall.green / overall.total * 100) : 0;
+  let h = '<div class="stats">';
+  h += '<div class="stat-overall"><div class="pct">' + pctGreen + '%</div><div class="pct-label">maîtrisé sur ' + overall.total + ' mots au total</div>' +
+    segbarHTML(overall) +
+    '<div class="legend"><span><i style="background:var(--again)"></i>' + overall.red + ' pas encore su</span>' +
+    '<span><i style="background:var(--warn)"></i>' + overall.yellow + ' en cours</span>' +
+    '<span><i style="background:var(--ok)"></i>' + overall.green + ' maîtrisé</span></div></div>';
+  h += '<div class="stat-cats">';
+  cats().forEach(c => {
+    const idx = V.map((_, i) => i).filter(i => V[i].cat === c);
+    const s = statsFor(idx);
+    const p = s.total ? Math.round(s.green / s.total * 100) : 0;
+    h += '<div class="stat-row"><div class="top"><b>' + c + '</b><span>' + p + '% · ' + s.total + ' mots</span></div>' + segbarHTML(s) + '</div>';
+  });
+  h += '</div></div>';
+  st.innerHTML = h;
+}
+
+function render() {
+  const isStats = mode === 'stats';
+  document.querySelector('.progress').style.display = isStats ? 'none' : '';
+  if (isStats) { $('catbar').style.display = 'none'; } else { renderCatbar(); }
+  document.querySelectorAll('#modes button').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode));
+  if (isStats) { renderStats(); return; }
+
+  const pool = wordsInCat();
+  const mastered = pool.filter(i => ensure(i).stage >= 5).length;
+  $('known').textContent = mastered + ' / ' + pool.length + ' maîtrisés';
+  $('fill').style.width = (pool.length ? mastered / pool.length * 100 : 0) + '%';
+  $('left').textContent = queue.length ? queue.length + (queue.length > 1 ? ' cartes à revoir' : ' carte à revoir') : '';
+
+  const st = $('stage');
+  if (!queue.length) {
+    const remaining = pool.length - mastered;
+    st.innerHTML = '<div class="card done" style="cursor:default"><div class="kanji">' + (remaining ? '頑張って' : 'よくできました') + '</div>' +
+      '<p>' + (remaining ? mastered + ' mot(s) maîtrisé(s), ' + remaining + ' encore en cours d\'apprentissage — rien à revoir pour l\'instant.' : 'Tous les mots de cette sélection sont maîtrisés !') + '</p></div>' +
+      '<div class="actions"><button class="btn know" id="all" style="grid-column:1/-1">Tout repasser en revue quand même</button></div>';
+    $('all').onclick = () => startSession(true);
+    return;
+  }
+  const v = V[queue[0]];
+  const cls = 'card' + (animate ? ' turn' : '');
+  animate = false;
+
+  if (mode === 'quiz') {
+    let h = '<div class="' + cls + '" style="cursor:default"><span class="stagepip">' + stageLabel(queue[0]) + '</span><div class="kanji">' + v.w + '</div>';
+    if (answered !== null) h += (reading(v) ? '<div class="read">' + reading(v) + '</div>' : '<div class="read">&nbsp;</div>') + (showRomaji && romajiOf(v) ? '<div class="romaji">' + romajiOf(v) + '</div>' : '');
+    h += '<div class="choices">';
+    options.forEach(i => {
+      let c = 'choice';
+      if (answered !== null) { if (i === queue[0]) c += ' right'; else if (i === answered) c += ' wrong'; }
+      h += '<button class="' + c + '" data-i="' + i + '" ' + (answered !== null ? 'disabled' : '') + '>' + V[i].f + '</button>';
+    });
+    h += '</div></div>';
+    if (answered !== null) h += '<div class="actions"><button class="btn next" id="next">Suivant</button></div>';
+    st.innerHTML = h;
+    st.querySelectorAll('.choice').forEach(b => b.onclick = () => {
+      const i = +b.dataset.i; answered = i;
+      if (i === queue[0]) markCorrect(queue[0]); else markWrong(queue[0]);
+      render();
+    });
+    if ($('next')) $('next').onclick = () => {
+      if (answered === queue[0]) queue.shift(); else reinsert();
+      answered = null; buildOptions(); render();
+    };
+    return;
+  }
+
+  let face = '';
+  if (mode === 'jp2fr') {
+    face = !flipped
+      ? '<span class="stagepip">' + stageLabel(queue[0]) + '</span><div class="kanji">' + v.w + '</div>' + readBlock(v) + '<div class="hint">Touche pour retourner</div>'
+      : '<span class="stagepip">' + stageLabel(queue[0]) + '</span><div class="kanji sm">' + v.w + '</div>' + readBlock(v) + '<div class="sep"></div><div class="fr">' + v.f + '</div>';
+  } else {
+    face = !flipped
+      ? '<span class="stagepip">' + stageLabel(queue[0]) + '</span><div class="fr">' + v.f + '</div><div class="hint">Dis le mot japonais à voix haute, puis retourne</div>'
+      : '<span class="stagepip">' + stageLabel(queue[0]) + '</span><div class="kanji">' + v.w + '</div>' + readBlock(v) + '<div class="sep"></div><div class="fr" style="font-size:22px;color:var(--muted);font-weight:500">' + v.f + '</div>';
+  }
+  st.innerHTML = '<div class="' + cls + '" id="card" tabindex="0" role="button" aria-label="Retourner la carte">' + face + '</div>' +
+    '<div class="actions">' + (flipped
+      ? '<button class="btn again" id="again">Je ne savais pas</button><button class="btn know" id="know">Je savais</button>'
+      : '<button class="btn flip" id="flip">Retourner</button>') + '</div>';
+  $('card').onclick = flip;
+  if ($('flip')) $('flip').onclick = flip;
+  if ($('again')) $('again').onclick = () => { markWrong(queue[0]); reinsert(); flipped = false; render(); };
+  if ($('know')) $('know').onclick = () => {
+    markCorrect(queue[0]);
+    if (isDue(queue[0])) reinsert(); else queue.shift();
+    flipped = false; render();
+  };
+}
+function flip() { flipped = !flipped; animate = true; render(); }
+
+document.querySelectorAll('#modes button').forEach(b => b.onclick = () => { mode = b.dataset.mode; flipped = false; answered = null; buildOptions(); render(); });
+$('showRomaji').onchange = e => { showRomaji = e.target.checked; render(); };
+$('reset').onclick = () => { srs = {}; saveSRS(); startSession(true); };
+document.addEventListener('keydown', e => {
+  if (mode === 'quiz' || !queue.length) return;
+  if (e.key === ' ' || e.key === 'Enter') { if (document.activeElement && document.activeElement.tagName === 'BUTTON') return; e.preventDefault(); flip(); }
+  else if (flipped && e.key === 'ArrowLeft') { $('again').click(); }
+  else if (flipped && e.key === 'ArrowRight') { $('know').click(); }
+});
+
+loadSRS();
+renderCatbar();
+startSession(false);
+</script>
+</body>
+</html>
